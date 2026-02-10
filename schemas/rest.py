@@ -1,4 +1,5 @@
-from typing import Any, Dict, List, Optional
+from typing import Any
+
 from pydantic import BaseModel, Field
 
 
@@ -24,21 +25,21 @@ class ClusterRowRequest(BaseModel):
 
 class ClusterRowResponse(BaseModel):
     cluster_id: int
-    cluster_label: Optional[str] = None
-    cluster_pct: Optional[float] = None
-    warnings: List[str] = []
+    cluster_label: str | None = None
+    cluster_pct: float | None = None
+    warnings: list[str] = []
 
 
 class ClusterFileResponse(BaseModel):
     n_rows: int
-    cluster_counts: Dict[str, int]
-    profiles: List[ClusterProfile] = []
-    preview: List[Dict[str, Any]]
-    warnings: List[str] = []
+    cluster_counts: dict[str, int]
+    profiles: list[ClusterProfile] = []
+    preview: list[dict[str, Any]]
+    warnings: list[str] = []
 
 
 class MetadataResponse(BaseModel):
     model_name: str
-    expected_columns: List[str]
-    params: Dict[str, Any]
-    metrics: Dict[str, float]
+    expected_columns: list[str]
+    params: dict[str, Any]
+    metrics: dict[str, float]

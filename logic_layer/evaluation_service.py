@@ -1,8 +1,9 @@
-from typing import Dict
-import numpy as np
-from sklearn.metrics import silhouette_score, davies_bouldin_score, calinski_harabasz_score
 
-def clustering_metrics(X: np.ndarray, labels: np.ndarray) -> Dict[str, float]:
+import numpy as np
+from sklearn.metrics import calinski_harabasz_score, davies_bouldin_score, silhouette_score
+
+
+def clustering_metrics(X: np.ndarray, labels: np.ndarray) -> dict[str, float]:
     if len(set(labels)) < 2:
         return {
             "silhouette": float("nan"),

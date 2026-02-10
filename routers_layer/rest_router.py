@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from io import BytesIO
-from typing import Any, Dict, List
+from typing import Any
 
 import pandas as pd
 from fastapi import APIRouter, File, HTTPException, Request, UploadFile
@@ -10,7 +10,6 @@ from fastapi.responses import StreamingResponse
 from data_layer.artifacts_repository import read_metadata
 from logic_layer.explain_service import profile_clusters
 from logic_layer.prediction_service import predict_batch, predict_one
-
 from schemas.rest import (
     ClusterFileResponse,
     ClusterRowRequest,
@@ -29,7 +28,7 @@ def _get_bundle(request: Request):
 
 
 @router.get("/health")
-def health() -> Dict[str, str]:
+def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
@@ -39,7 +38,7 @@ def metadata() -> Any:
 
 
 @router.get("/profiles")
-def get_profiles(request: Request) -> Dict[str, Any]:
+def get_profiles(request: Request) -> dict[str, Any]:
     prof_map = getattr(request.app.state, "cluster_profile_map", {})
     profiles = list(prof_map.values())
     return {"profiles": profiles}

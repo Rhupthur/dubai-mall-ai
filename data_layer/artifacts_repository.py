@@ -3,10 +3,9 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import joblib
-
 
 # Racine projet = parent de data_layer/
 BASE_DIR = Path(__file__).resolve().parents[1]
@@ -19,7 +18,7 @@ METADATA_FILENAME = "metadata.json"
 @dataclass(frozen=True)
 class ModelBundle:
     pipeline: Any
-    metadata: Dict[str, Any]
+    metadata: dict[str, Any]
 
     @property
     def expected_columns(self):
@@ -38,7 +37,7 @@ class ModelBundle:
         return self.metadata.get("metrics", {})
     
 
-def save_bundle(bundle: ModelBundle) -> Dict[str, str]:
+def save_bundle(bundle: ModelBundle) -> dict[str, str]:
     """
     Sauvegarde:
     - pipeline: artifacts/clustering_pipeline.joblib
@@ -55,7 +54,7 @@ def save_bundle(bundle: ModelBundle) -> Dict[str, str]:
     return {"pipeline_path": str(pipeline_path), "metadata_path": str(metadata_path)}
 
 
-def read_metadata() -> Dict[str, Any]:
+def read_metadata() -> dict[str, Any]:
     """
     Lit artifacts/metadata.json
     """
@@ -65,7 +64,7 @@ def read_metadata() -> Dict[str, Any]:
     return json.loads(metadata_path.read_text(encoding="utf-8"))
 
 
-def load_bundle(artifacts_dir: Optional[str] = None) -> ModelBundle:
+def load_bundle(artifacts_dir: str | None = None) -> ModelBundle:
     """
     Charge pipeline + metadata depuis artifacts/
     """

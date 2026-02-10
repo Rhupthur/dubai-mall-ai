@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import pandas as pd
 
@@ -41,7 +41,7 @@ def profile_clusters(
     bundle: ClusteringBundle,
     df_raw: pd.DataFrame,
     cluster_col: str = "cluster_id",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Retourne un résumé métier des segments :
     - counts / pourcentages
@@ -70,7 +70,7 @@ def profile_clusters(
         mean_spending=("Spending Score (1-100)", "mean"),
     )
 
-    profiles: List[ClusterProfile] = []
+    profiles: list[ClusterProfile] = []
     for _, row in grp.iterrows():
         cid = int(row[cluster_col])
         size = int(row["size"])

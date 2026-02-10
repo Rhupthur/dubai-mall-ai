@@ -1,11 +1,12 @@
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import Any
+
 
 @dataclass(frozen=True)
 class ClusteringBundle:
     pipeline: Any  # sklearn Pipeline: preprocess + model
-    expected_columns: List[str]
+    expected_columns: list[str]
     model_name: str
-    params: Dict[str, Any]
-    metrics: Dict[str, float]
-    run_id: Optional[str] = None  # pour MLflow plus tard
+    params: dict[str, Any]
+    metrics: dict[str, float]
+    run_id: str | None = None  # pour MLflow plus tard

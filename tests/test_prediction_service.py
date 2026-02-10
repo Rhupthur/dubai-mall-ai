@@ -1,8 +1,8 @@
-import pytest
 import pandas as pd
+import pytest
 
 from data_layer.artifacts_repository import load_bundle
-from logic_layer.prediction_service import predict_one, predict_batch
+from logic_layer.prediction_service import predict_batch, predict_one
 
 
 @pytest.fixture(scope="module")

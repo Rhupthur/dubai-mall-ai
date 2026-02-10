@@ -9,13 +9,11 @@ from logic_layer.explain_service import profile_clusters
 from routers_layer.rest_router import router as api_router
 from routers_layer.web_router import router as web_router
 
-
 app = FastAPI(title="Dubai Mall Customer Segmentation")
 
 
 def _resolve_ref_data_path() -> str:
     import os
-    from pathlib import Path
 
     # 1) env var (doit être un FICHIER CSV)
     raw = os.environ.get("REF_DATA_PATH")

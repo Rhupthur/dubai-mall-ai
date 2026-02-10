@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from data_layer.dataset_repository import load_csv
 from data_layer.artifacts_repository import save_bundle
+from data_layer.dataset_repository import load_csv
 from logic_layer.modeling_service import fit_kmeans_k4
 
 if __name__ == "__main__":
