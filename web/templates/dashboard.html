@@ -1,0 +1,87 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<section class="grid2">
+  <div class="card">
+    <h2>Infos modèle</h2>
+    <div class="kv">
+      <div class="k">Algo</div><div class="v" id="modelName">—</div>
+      <div class="k">k</div><div class="v" id="kValue">—</div>
+      <div class="k">Silhouette</div><div class="v" id="silhouette">—</div>
+      <div class="k">Davies-Bouldin</div><div class="v" id="dbi">—</div>
+      <div class="k">Calinski-Harabasz</div><div class="v" id="chi">—</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Distribution des segments (upload CSV)</h2>
+    <canvas id="distChart" height="120"></canvas>
+    <p class="hint">Charge un CSV pour afficher la distribution.</p>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Simulation client</h2>
+
+  <div class="grid4">
+    <label>Gender
+      <select id="gender">
+        <option>Male</option>
+        <option>Female</option>
+      </select>
+    </label>
+    <label>Age
+      <input id="age" type="number" min="0" value="30">
+    </label>
+    <label>Annual Income (k$)
+      <input id="income" type="number" min="0" value="60">
+    </label>
+    <label>Spending Score (1-100)
+      <input id="spending" type="number" min="1" max="100" value="50">
+    </label>
+  </div>
+
+  <button id="btnSim">Segmenter</button>
+
+  <div id="simBadge" style="margin-top:10px;"></div>
+
+  <!-- ✅ affichage lisible (pas JSON) -->
+  <div id="simHuman" class="simHuman">—</div>
+
+  <div style="margin-top:12px;">
+    <canvas id="radarChart" height="120"></canvas>
+  </div>
+
+  <!-- Debug caché -->
+  <pre id="simOut" class="debug">—</pre>
+</section>
+
+<section class="card">
+  <h2>Upload CSV (batch)</h2>
+
+  <div class="row">
+    <input id="csvFile" type="file" accept=".csv"/>
+    <button id="btnUpload">Analyser</button>
+    <button id="btnExport" disabled>Exporter CSV enrichi</button>
+  </div>
+
+  <div class="grid2" style="margin-top: 12px;">
+    <div>
+      <h3>Résumé</h3>
+      <div id="summaryCards" class="summary"></div>
+
+      <!-- Debug caché -->
+      <pre id="fileOut" class="debug">—</pre>
+    </div>
+
+    <div>
+      <h3>Profils des clusters</h3>
+      <div id="profiles" class="profiles"></div>
+    </div>
+  </div>
+
+  <h3 style="margin-top: 16px;">Preview (20 lignes)</h3>
+  <div id="preview"></div>
+</section>
+
+{% endblock %}
