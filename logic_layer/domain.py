@@ -1,12 +1,28 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import Any
+
+from sklearn.pipeline import Pipeline
 
 
 @dataclass(frozen=True)
 class ClusteringBundle:
-    pipeline: Any  # sklearn Pipeline: preprocess + model
+    pipeline: Pipeline
     expected_columns: list[str]
-    model_name: str
     params: dict[str, Any]
     metrics: dict[str, float]
-    run_id: str | None = None  # pour MLflow plus tard
+    model_name: str = "kmeans"
+
+    @property
+    def metadata(self) -> dict[str, Any]:
+        return {
+            "model_name": self.model_name,
+            "expected_columns": self.expected_columns,
+            "params": self.params,
+            "metrics": self.metrics,
+        }
+
+
+ModelBundle = ClusteringBundle
+
