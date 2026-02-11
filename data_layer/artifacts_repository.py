@@ -16,14 +16,12 @@ def _extract_metadata(bundle: Any) -> dict[str, Any]:
     - ModelBundle (bundle.metadata existe)
     - ClusteringBundle (bundle.model_name / expected_columns / params / metrics)
     """
-    if hasattr(bundle, "metadata"):
-        meta = getattr(bundle, "metadata")
-        if isinstance(meta, dict):
-            return meta
-        # au cas où metadata serait un pydantic/dataclass
-        return dict(meta)
+    meta = bundle.metadata if hasattr(bundle, "metadata") else None
+    if isinstance(meta, dict):
+        return meta
 
-    # Fallback: ClusteringBundle-like
+    return dict(meta)
+
     model_name = getattr(bundle, "model_name", "kmeans")
     expected_columns = getattr(bundle, "expected_columns", None)
     params = getattr(bundle, "params", {}) or {}
