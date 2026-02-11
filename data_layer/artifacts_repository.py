@@ -1,64 +1,72 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 import joblib
 
-# Racine projet = parent de data_layer/
-BASE_DIR = Path(__file__).resolve().parents[1]
-ARTIFACTS_DIR = BASE_DIR / "artifacts"
-
-PIPELINE_FILENAME = "clustering_pipeline.joblib"
-METADATA_FILENAME = "metadata.json"
+from data_layer.settings import ARTIFACTS_DIR, METADATA_FILENAME, PIPELINE_FILENAME
+from logic_layer.domain import ModelBundle
 
 
-@dataclass(frozen=True)
-class ModelBundle:
-    pipeline: Any
-    metadata: dict[str, Any]
-
-    @property
-    def expected_columns(self):
-        return self.metadata.get("expected_columns", [])
-
-    @property
-    def model_name(self):
-        return self.metadata.get("model_name")
-
-    @property
-    def params(self):
-        return self.metadata.get("params", {})
-
-    @property
-    def metrics(self):
-        return self.metadata.get("metrics", {})
-    
-
-def save_bundle(bundle: ModelBundle) -> dict[str, str]:
+def _extract_metadata(bundle: Any) -> dict[str, Any]:
     """
-    Sauvegarde:
-    - pipeline: artifacts/clustering_pipeline.joblib
-    - metadata: artifacts/metadata.json
+    Supporte:
+    - ModelBundle (bundle.metadata existe)
+    - ClusteringBundle (bundle.model_name / expected_columns / params / metrics)
     """
-    ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
+    if hasattr(bundle, "metadata"):
+        meta = getattr(bundle, "metadata")
+        if isinstance(meta, dict):
+            return meta
+        # au cas où metadata serait un pydantic/dataclass
+        return dict(meta)
 
-    pipeline_path = ARTIFACTS_DIR / PIPELINE_FILENAME
-    metadata_path = ARTIFACTS_DIR / METADATA_FILENAME
+    # Fallback: ClusteringBundle-like
+    model_name = getattr(bundle, "model_name", "kmeans")
+    expected_columns = getattr(bundle, "expected_columns", None)
+    params = getattr(bundle, "params", {}) or {}
+    metrics = getattr(bundle, "metrics", {}) or {}
 
-    joblib.dump(bundle.pipeline, pipeline_path)
-    metadata_path.write_text(json.dumps(bundle.metadata, indent=2), encoding="utf-8")
+    if expected_columns is None:
+        # dernière sécurité si jamais c'est stocké ailleurs
+        expected_columns = getattr(bundle, "EXPECTED_COLUMNS", [])
 
-    return {"pipeline_path": str(pipeline_path), "metadata_path": str(metadata_path)}
+    return {
+        "model_name": model_name,
+        "expected_columns": list(expected_columns),
+        "params": dict(params),
+        "metrics": dict(metrics),
+    }
 
 
-def read_metadata() -> dict[str, Any]:
+def save_bundle(bundle: Any, artifacts_dir: str | None = None) -> None:
     """
-    Lit artifacts/metadata.json
+    Sauvegarde pipeline + metadata dans artifacts/
     """
-    metadata_path = ARTIFACTS_DIR / METADATA_FILENAME
+    base = Path(artifacts_dir) if artifacts_dir else ARTIFACTS_DIR
+    base.mkdir(parents=True, exist_ok=True)
+
+    pipeline_path = base / PIPELINE_FILENAME
+    metadata_path = base / METADATA_FILENAME
+
+    pipeline = getattr(bundle, "pipeline", None)
+    if pipeline is None:
+        raise ValueError("bundle.pipeline is missing (cannot save pipeline)")
+
+    meta = _extract_metadata(bundle)
+
+    joblib.dump(pipeline, pipeline_path)
+    metadata_path.write_text(json.dumps(meta, indent=2), encoding="utf-8")
+
+
+def read_metadata(artifacts_dir: str | None = None) -> dict[str, Any]:
+    """
+    Lit metadata.json
+    """
+    base = Path(artifacts_dir) if artifacts_dir else ARTIFACTS_DIR
+    metadata_path = base / METADATA_FILENAME
     if not metadata_path.exists():
         raise FileNotFoundError(f"Metadata not found: {metadata_path}")
     return json.loads(metadata_path.read_text(encoding="utf-8"))
@@ -80,4 +88,11 @@ def load_bundle(artifacts_dir: str | None = None) -> ModelBundle:
 
     pipeline = joblib.load(pipeline_path)
     metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
-    return ModelBundle(pipeline=pipeline, metadata=metadata)
+
+    return ModelBundle(
+        pipeline=pipeline,
+        model_name=metadata.get("model_name", "kmeans"),
+        expected_columns=metadata.get("expected_columns", []),
+        params=metadata.get("params", {}),
+        metrics=metadata.get("metrics", {}),
+    )
